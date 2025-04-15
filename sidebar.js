@@ -45,7 +45,10 @@ async function renderClippedPages() {
       const clipItem = document.createElement('div');
       clipItem.className = 'clip-item';
       clipItem.innerHTML = `
-        <div class="clip-title">${page.title}</div>
+        <div class="clip-title">
+          ${page.favicon ? `<img src="${page.favicon}" class="favicon" onerror="this.style.display='none'">` : ''}
+          ${page.title}
+        </div>
         <a href="${page.url}" class="clip-url" target="_blank">${page.url}</a>
         <div class="clip-date">${formatDate(page.timestamp)}</div>
         <div class="clip-metadata">

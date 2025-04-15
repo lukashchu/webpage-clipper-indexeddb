@@ -17,11 +17,16 @@ function extractTextContent(doc) {
 
 // Function to clip the current page
 function clipCurrentPage() {
+  // Extract favicon URL
+  const faviconElement = document.querySelector('link[rel~="icon"]') || document.querySelector('link[rel="shortcut icon"]');
+  const favicon = faviconElement ? faviconElement.href : '';
+
   const pageData = {
     title: document.title,
     url: window.location.href,
     timestamp: new Date().toISOString(),
-    content: extractTextContent(document)
+    content: extractTextContent(document),
+    favicon
   };
   
   // Send the data to the background script
