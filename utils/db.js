@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = 'WebpageClipperDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented version to handle schema changes
 const STORE_NAME = 'clippedPages';
 
 // Database connection
@@ -21,13 +21,15 @@ async function initDB() {
     // Create the object store (table) if it doesn't exist
     if (!db.objectStoreNames.contains(STORE_NAME)) {
       // Create a store with autoIncrement ID as key
-      const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+      db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
       
       // Define indexes for faster queries
-      store.createIndex('url', 'url', { unique: false });
-      store.createIndex('timestamp', 'timestamp', { unique: false });
+      db.createIndex('url', 'url', { unique: false });
+      db.createIndex('timestamp', 'timestamp', { unique: false });
       
       console.log('Database schema created');
+    } else {
+      console.log('Migrated to schema version 2');
     }
   };
   
@@ -53,9 +55,14 @@ async function addClippedPage(pageData) {
     throw new Error('Database not initialized');
   }
   
-  // Add timestamp if not provided
+  // Calculate word count and reading time
+  const wordCount = pageData.content ? pageData.content.split(/\s+/).filter(word => word).length : 0;
+  const readingTime = Math.ceil(wordCount / 200); // Assuming an average reading speed of 200 words per minute
+
   const data = { 
     ...pageData,
+    wordCount,
+    readingTime,
     timestamp: pageData.timestamp || new Date().toISOString()
   };
   
